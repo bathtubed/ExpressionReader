@@ -12,7 +12,7 @@ public:
 	Operator *lOperand;	//Pointer to the left operand
 	Operator *rOperand;	//Pointer to the right operand
 	char *opLoc;		//Pointer to the character in the expression string of the operator
-	OPFUNC *opFunc;		//Pointer to the function represented by the symbol pointed to by opLoc
+	opSymb *opFunc;		//Pointer to the function represented by the symbol pointed to by opLoc
 
 public:
 	Operator(char *op, Operator * const lop, Operator * const rop);
@@ -27,9 +27,10 @@ public:
 	const Operator * const getLeft() const;
 	const Operator * const getRight() const;
 	char * const getLoc() const;
-	const op_t getOpType();
+	const op_t getOpType() const;
 	const double getResult() throw(int);	//returns the result of the Operator, will call getResult of Operators if they aren't NULL.
-											//Throws 42 if a function of one instance is called twice.
+											//Throws 1 if the function cannot make the calculation.
+											//Throws 2 if a function of one instance is called twice.
 	double *getVariable();					//returns the address of the result value. 
 private:
 	bool curCalc;	//used to regulate how many times a single instance of getResult is called

@@ -28,9 +28,19 @@ const unsigned short opSymb::getPriority()
 	return prior;
 }
 
-OPFUNC opSymb::getFunc()
+double opSymb::func()
 {
-	return opFunc;
+	return opFunc.arg0();
+}
+
+double opSymb::func(double a)
+{
+	return opFunc.arg1(a);
+}
+
+double opSymb::func(double a, double b)
+{
+	return opFunc.arg2(a, b);
 }
 
 //Index of functions

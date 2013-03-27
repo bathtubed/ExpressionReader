@@ -1,14 +1,15 @@
 #include "Operator.h"
 
-Operator::Operator(char *op=NULL, Operator * const lop=NULL, Operator * const rop=NULL): lOperand(lop), rOperand(rop)
+Operator::Operator(char *op=NULL, Operator * const lop=NULL, Operator * const rop=NULL): lOperand(lop), rOperand(rop), result(0), curCalc(false)
 {
 	if(op==NULL)
 		opLoc=NULL;
 	else
 	{
-		if(setLoc(op))
+		if(!setLoc(op))
 		{
 			printf("Operator constructor was passed with invalid operation symbol\n");
+
 			opLoc=NULL;
 		}
 	}
@@ -17,8 +18,7 @@ Operator::Operator(char *op=NULL, Operator * const lop=NULL, Operator * const ro
 const bool Operator::isValidNum(const char c)
 {
 	if(	c == '.' ||
-		c <= '9' ||
-		c >= '0' )
+		(c <= '9' && c >= '0' ))
 		return true;
 	else
 		return false;
@@ -90,8 +90,10 @@ const bool Operator::setLoc(char * const loc)
 		break;
 	case SYM:
 		result		= 0;
-		opFunc		= &opSymb::valid[symbol]->getFunc();
+		opFunc		= opSymb::valid[symbol];
 		opLoc		= loc;
+		break;
+	default:
 		break;
 	}
 	
@@ -111,4 +113,54 @@ inline const Operator * const Operator::getRight() const
 inline char * const Operator::getLoc() const
 {
 	return opLoc;
+}
+
+inline const Operator::op_t Operator::getOpType() const
+{
+	return opType;
+}
+
+double *Operator::getVariable()
+{
+	if(opType == VAR)
+		return &result;
+	else
+		return NULL;
+}
+
+const double Operator::getResult()
+{
+	if(curCalc)
+	{
+		printf("Operator::getResult called itself through recursion at some point.\n \
+Tests are being done from function of object who had said function called a second time.\n\n");
+		if(this == lOperand)
+			printf("The left operand of this operator points to itself.\n");
+		if(this == rOperand)
+			printf("The right operand of this operator points to itself.\n");
+		if(lOperand == rOperand)
+			printf("The left and right operands point to the same operators.\n");
+		throw 2;
+	}
+	else
+		curCalc = true;
+	if(opType == INVALID)
+		throw 1;
+	if(opType == SYM)
+	{
+		switch(opFunc->getArguments())
+		{
+		case 0:
+			result = opFunc->func();
+			break;
+		case 1:
+			result = opFunc->func(lOperand->getResult());
+			break;
+		case 2:
+			result = opFunc->func(lOperand->getResult(), rOperand->getResult());
+			break;
+		}
+	}
+	curCalc = false;
+	return result;
 }

@@ -44,7 +44,9 @@ public:
 	opSymb(const ARG2 func, const unsigned short p);
 
 public:	//get functions
-	OPFUNC getFunc();
+	double func();
+	double func(double a);
+	double func(double a, double b);
 	const unsigned short getPriority();
 	const unsigned short getArguments();
 };
