@@ -64,7 +64,7 @@ public:
 	
 	const Operator const *getLeft() const
 	const Operator const *getRight() const 
-	const char const *getLoc() const
+	char const *getLoc() const
 	
 public:
 	const double getResult()

@@ -28,7 +28,7 @@ const unsigned short opSymb::getPriority()
 	return prior;
 }
 
-const OPFUNC opSymb::getFunc()
+OPFUNC opSymb::getFunc()
 {
 	return opFunc;
 }

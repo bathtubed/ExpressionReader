@@ -5,6 +5,9 @@
 
 class Operator
 {
+public:
+	typedef enum {INVALID, NUM, SYM, VAR} op_t;
+
 	double result;		//Result of the function on the results of the two operands
 	Operator *lOperand;	//Pointer to the left operand
 	Operator *rOperand;	//Pointer to the right operand
@@ -18,15 +21,19 @@ public:
 	void setLeft(Operator * const oper);
 	void setRight(Operator * const oper);
 	const bool setLoc(char * const loc);
-	static const bool isValidNum(char c);	//returns true if the character is a valid number character (numeral, '-', '.')
+	static const bool isValidNum(const char c);					//returns true if the character is a valid number character (numeral, '-', '.')
+	static const op_t isValid(const string s, string &dest);	//returns a parsed string, if the arguments are valid. If invalid, it will return an empty string
 
 	const Operator * const getLeft() const;
 	const Operator * const getRight() const;
 	char * const getLoc() const;
-	const double getResult() throw(string);	//returns the result of the Operator, will call getResult of Operators if they aren't NULL.
-											//Throws exception if a function of one instance is called twice.
+	const op_t getOpType();
+	const double getResult() throw(int);	//returns the result of the Operator, will call getResult of Operators if they aren't NULL.
+											//Throws 42 if a function of one instance is called twice.
+	double *getVariable();					//returns the address of the result value. 
 private:
 	bool curCalc;	//used to regulate how many times a single instance of getResult is called
+	op_t opType;	//used to regulate whether returning a varying pointer to the result value is allowed.
 };
 
 

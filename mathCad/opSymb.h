@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <unordered_map>
+#include <algorithm>
 #include <math.h>
 using namespace std;
 
@@ -42,7 +43,7 @@ public:
 	opSymb(const ARG2 func, const unsigned short p);
 
 public:	//get functions
-	const OPFUNC getFunc();
+	OPFUNC getFunc();
 	const unsigned short getPriority();
 	const unsigned short getArguments();
 };
