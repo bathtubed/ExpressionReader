@@ -1,0 +1,1 @@
+Application whose current goal is to read text input and convert it mathematical expressions/equations and be able to manipulate these expressions and equations.
