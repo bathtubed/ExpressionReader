@@ -2,6 +2,7 @@
 #define OP_SYMB_H_
 
 #include <stdlib.h>
+#include <string>
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
