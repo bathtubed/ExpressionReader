@@ -1,0 +1,80 @@
+typedef double (ARG2 *)(double, double)
+typedef double (ARG1 *)(double)
+typedef double (ARG0 *)()
+typedef union
+{
+	ARG2 arg2
+	ARG1 arg1
+	ARG0 arg0
+} OPFUNC
+
+
+opSymb
+public:
+	static vector<opSymb *> valid
+	static bool LoadOpSymb(char *fileName)
+		fp = fopen(fileName, "r")
+		for every line in the file
+			fscanf(fp, "%s:%p:%i", string, funcP, i)
+			valid.push_back(new opSymb(string, (i==0? (ARG0):(i==1? (ARG1):(ARG2)))funcP))
+		fclose(fp)
+		
+private:
+	OPFUNC opFunc
+	String symb
+	
+public:
+	opSymb(const String s, ARG1 *func): symb(s), opFunc(func)	{}
+	opSymb(const String s, ARG2 *func): symb(s), opFunc(func)	{}
+	bool operator== (String s)
+		return symb == s
+	
+
+
+Operator
+
+	double result
+	Operator *lOperand
+	Operator *rOperand
+	char   *opLoc
+	OPFUNC *opFunc
+public:
+	Operator()
+	{
+		lOperand = rOperand = NULL
+		opLoc = NULL
+		opFunc = NULL
+		result = 0
+	}
+public:
+	void setLeft(Operator *)
+	void setRight(Operator *)
+	bool setLoc(char *op)
+		if *(opLoc = op) is num
+			lOperand = rOperand = NULL
+			opFunc = NULL
+			copy valid characters including and following opLoc into str
+			result = atof(str)
+		else if result of search of valid op-symbols (opSymb::valid) isn't last
+			opFunc = &(opSymb::valid[result]->opFunc)
+		else
+			return FAILURE (false)
+		
+		return SUCCESS (true)
+	
+	const Operator const *getLeft() const
+	const Operator const *getRight() const 
+	const char const *getLoc() const
+	
+public:
+	const double getResult()
+		double left, right
+		if lOperand != NULL
+			left = lOperand->getResult()
+			if rOperand != NULL
+				right = rOperand->getResult()
+				result = opFunc.arg2(left, right)
+			else
+				result = opFunc.arg1(left, right)
+		return result
+	
