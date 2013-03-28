@@ -5,11 +5,14 @@
 int main(void)
 {
 	opSymb::loadValid();
-	string expression("");
-	Operator *plus = new Operator(&expression[1], new Operator(&expression[0], NULL, NULL), new Operator(&expression[2], NULL, NULL));
+	string expression("6/2*(2+PI)");
+	Operator *div	= new Operator(&expression[1], new Operator(&expression[0], NULL, NULL), new Operator(&expression[2], NULL, NULL));
+	Operator *plus	= new Operator(&expression[6], new Operator(&expression[5], NULL, NULL), new Operator(&expression[7], NULL, NULL));
+	Operator *par	= new Operator(&expression[4], plus, NULL);
+	Operator *total	= new Operator(&expression[3], div, par);
 	try
 	{
-		cout<<expression<<" evaluates to >"<<endl<<plus->getResult()<<endl;
+		cout<<expression<<" evaluates to >"<<endl<<total->getResult()<<endl;
 	}
 	catch(int e)
 	{

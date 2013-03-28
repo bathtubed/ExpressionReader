@@ -64,11 +64,19 @@ double par(double a)
 	return a;
 }
 
+double getPi()
+{
+	return 3.14159265359;
+}
+
 void opSymb::loadValid()
 {
-	valid["+"] = new opSymb(add, ADD_PRIORITY);
-	valid["*"] = new opSymb(mult, MULT_PRIORITY);
-	valid["/"] = new opSymb(div, DIV_PRIORITY);
-	valid["^"] = new opSymb(pow, POW_PRIORITY);
-	valid["("] = new opSymb(par, PAR_PRIORITY);
+	valid["+"]		= new opSymb(add, ADD_PRIORITY);
+	valid["*"]		= new opSymb(mult, MULT_PRIORITY);
+	valid["/"]		= new opSymb(div, DIV_PRIORITY);
+	valid["^"]		= new opSymb(pow, POW_PRIORITY);
+	valid["("]		= new opSymb(par, PAR_PRIORITY);
+	valid["PI"]		= new opSymb(getPi, SYMB_PRIORITY);
+	valid["Pi"]		= valid["PI"];
+	valid["pi"]		= valid["PI"];
 }
