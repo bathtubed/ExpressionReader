@@ -116,8 +116,8 @@ private:
 					best = i
 				if (*i)->getFunc()->getPriority() >= (high? 0:((*init)->getFunc()->getPriority()))
 					break;
-				if *((*i)->getLoc()) == (right? '(':')')
-					i = getOperand(i, (flags & RIGHT) | SKIP)
+			if *((*i)->getLoc()) == (right? '(':')')
+				i = getOperand(i, (flags & RIGHT) | SKIP)
 				
 		return (skip? i:best)
 		
