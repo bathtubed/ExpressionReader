@@ -101,6 +101,8 @@ private:
 		for(i = 0; i < proc.size(); i++)
 			if(!Operator::isValid(proc[i]).empty())
 				conv.push_back(new Operator(proc[i], NULL, NULL))
+				if (*conv.end())->getOpType() == VAR
+					variables[*((*conv.end())->getLoc())] = (*conv.end())->getVariable()
 	
 	convIterator getOperand(convIterator init, unsigned short flags)
 		bool right = flags & RIGHT
@@ -116,25 +118,12 @@ private:
 					break;
 				if *((*i)->getLoc()) == (right? '(':')')
 					i = getOperand(i, (flags & RIGHT) | SKIP)
+				
 		return (skip? i:best)
-	
-				
-				
-	
-	
-	
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		
+		Expression(char *s): raw(s)
+			process()
+			convert()
+			for(iterator i = conv.begin(); i!=conv.end(); i++)
+				(*i)->setLeftOp(getOperand(i, 0))
+				(*i)->setRightOp(getOperand(i, RIGHT))
