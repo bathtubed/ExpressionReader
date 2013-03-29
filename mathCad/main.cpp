@@ -8,7 +8,7 @@ int main(void)
 	string expression("6/2*(2+PI)");
 	Operator *div	= new Operator(&expression[1], new Operator(&expression[0], NULL, NULL), new Operator(&expression[2], NULL, NULL));
 	Operator *plus	= new Operator(&expression[6], new Operator(&expression[5], NULL, NULL), new Operator(&expression[7], NULL, NULL));
-	Operator *par	= new Operator(&expression[4], plus, NULL);
+	Operator *par	= new Operator(&expression[4], NULL, plus);
 	Operator *total	= new Operator(&expression[3], div, par);
 	try
 	{

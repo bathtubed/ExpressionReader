@@ -15,6 +15,7 @@ using namespace std;
 #define MULT_PRIORITY	POW_PRIORITY+10
 #define DIV_PRIORITY	MULT_PRIORITY
 #define ADD_PRIORITY	MULT_PRIORITY+10
+#define HIGH_PRIORITY	ADD_PRIORITY+10
 
 
 typedef double (* ARG0)();					//used for functions which get constants such as e, or PI
@@ -47,8 +48,8 @@ public:	//get functions
 	double func();
 	double func(double a);
 	double func(double a, double b);
-	const unsigned short getPriority();
-	const unsigned short getArguments();
+	const unsigned short getPriority() const;
+	const unsigned short getArguments() const;
 };
 
 /*

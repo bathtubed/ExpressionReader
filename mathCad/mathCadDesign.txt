@@ -77,4 +77,64 @@ public:
 			else
 				result = opFunc.arg1(left, right)
 		return result
+end
+
+Expression
+	char *raw					//raw string input from user
+	string proc					//proc string input from user
+	vector<Operator *>	conv	//first operator in tree structure of expression
+	unordered_map<char, vector<double *>> variables
+	/****************************************************************************************
+	* database of all the variables used by this expression. 								*
+	* one string to one undefined sized list of pointers to doubles (operator results)		*
+	*****************************************************************************************/
 	
+private:
+	void process()
+		convert any sequence of !('+'), '-', (number, variable, ('(')); to ('+'), '-', (number, variable, ('(')).
+		//subtraction is the same as adding the opposite
+		convert any sequence of ('-'), !(number); to ('-1*'), !(number)
+		//opposite of an enclosed term is the same as -1 times the term
+		place parentheses around whole thing
+		
+	void convert()
+		for(i = 0; i < proc.size(); i++)
+			if(!Operator::isValid(proc[i]).empty())
+				conv.push_back(new Operator(proc[i], NULL, NULL))
+	
+	convIterator getOperand(convIterator init, unsigned short flags)
+		bool right = flags & RIGHT
+		bool skip = flags & SKIP
+		bool high = *((*init)->getLoc()) == (right? '(':')')
+		convIterator i, best
+		for (i = init + (right? 1:-1); *((*i)->getLoc())!=(right? ')':'('); right? ++i:--i)
+			if(!skip)
+				if (*i)->getFunc()->getPriority() <= (high? 0:((*init)->getFunc()->getPriority())) && 
+				(*i)->getFunc()->getPriority() > (best == NULL? 0:(*best)->getFunc()->getPriority())
+					best = i
+				if (*i)->getFunc()->getPriority() >= (high? 0:((*init)->getFunc()->getPriority()))
+					break;
+				if *((*i)->getLoc()) == (right? '(':')')
+					i = getOperand(i, (flags & RIGHT) | SKIP)
+		return (skip? i:best)
+	
+				
+				
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+

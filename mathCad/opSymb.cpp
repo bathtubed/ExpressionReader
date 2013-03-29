@@ -18,12 +18,12 @@ opSymb::opSymb(const ARG2 func, const unsigned short p): prior(p), args(2)
 	opFunc.arg2 = func;
 }
 
-const unsigned short opSymb::getArguments()
+const unsigned short opSymb::getArguments() const
 {
 	return args;
 }
 
-const unsigned short opSymb::getPriority()
+const unsigned short opSymb::getPriority() const
 {
 	return prior;
 }

@@ -60,6 +60,28 @@ const Operator::op_t Operator::isValid(const string s, string &dest)
 	}
 }
 
+
+const string Operator::isValid(const string s, op_t &dest)
+{
+	string rtrn;
+	dest = isValid(s, rtrn);
+	return rtrn;
+}
+
+/*
+const Operator::op_t Operator::isValid(const string s)
+{
+	string garbage;
+	return isValid(s, garbage);
+}
+*/
+
+const string Operator::isValid(const string s)
+{
+	op_t garbage;
+	return isValid(s, garbage);
+}
+
 inline void Operator::setLeft(Operator * const oper)
 {
 	lOperand = oper;
@@ -128,10 +150,17 @@ double *Operator::getVariable()
 		return NULL;
 }
 
+const opSymb * const Operator::getFunc() const
+{
+	return opFunc;
+}
+
 const double Operator::getResult()
 {
 	if(curCalc)
 	{
+		/****** Uncomment in debug mode only ****************************************
+
 		printf("Operator::getResult called itself through recursion at some point.\n \
 Tests are being done from function of object who had said function called a second time.\n\n");
 		if(this == lOperand)
@@ -140,6 +169,7 @@ Tests are being done from function of object who had said function called a seco
 			printf("The right operand of this operator points to itself.\n");
 		if(lOperand == rOperand)
 			printf("The left and right operands point to the same operators.\n");
+		*/
 		throw 2;
 	}
 	else
@@ -154,7 +184,7 @@ Tests are being done from function of object who had said function called a seco
 			result = opFunc->func();
 			break;
 		case 1:
-			result = opFunc->func(lOperand->getResult());
+			result = opFunc->func(rOperand->getResult());
 			break;
 		case 2:
 			result = opFunc->func(lOperand->getResult(), rOperand->getResult());
