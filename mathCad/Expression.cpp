@@ -52,7 +52,7 @@ void Expression::process()
 
 	for(string::iterator i = proc.begin(); (i+2) != proc.end(); i++)
 	{
-		if(*i != '+' && *(i+1) == '-' && (Operator::isValid(&(*(i+2)), garbage) != Operator::INVALID))
+		if(Operator::isValid(&*i, garbage) != Operator::SYM && *(i+1) == '-' && (Operator::isValid(&(*(i+2)), garbage) != Operator::INVALID))
 			proc.replace(i+1, i+2, "+-");
 	}
 
