@@ -8,6 +8,8 @@ class Expression
 {
 public:
 	typedef vector<Operator *>::iterator OpIter;
+	typedef unordered_map<char, vector<double *>>::iterator VarIter;
+private:
 	char *raw;									//raw user input
 	string proc;								//processed user input into readable content
 	vector<Operator *> conv;					//vector/array of pointers to Operators in proc
@@ -19,8 +21,12 @@ private:
 	OpIter getOperand(OpIter init, unsigned short flags);
 public:
 	Expression(char * const init);
+	Expression(string init);
+
 	void setRaw(char * const s);
-}
+
+	double evaluate();	//Default; Sets all variables to 0;
+};
 
 
 #endif /*EXPRESSION_H_*/

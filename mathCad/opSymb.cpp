@@ -69,6 +69,11 @@ double getPi()
 	return 3.14159265359;
 }
 
+double num()
+{
+	return 0;
+}
+
 void opSymb::loadValid()
 {
 	valid["+"]		= new opSymb(add, ADD_PRIORITY);
@@ -79,4 +84,6 @@ void opSymb::loadValid()
 	valid["PI"]		= new opSymb(getPi, SYMB_PRIORITY);
 	valid["Pi"]		= valid["PI"];
 	valid["pi"]		= valid["PI"];
+	
+	valid[NUM_KEY]	= new opSymb(num, SYMB_PRIORITY);
 }

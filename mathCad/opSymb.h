@@ -17,6 +17,8 @@ using namespace std;
 #define ADD_PRIORITY	MULT_PRIORITY+10
 #define HIGH_PRIORITY	ADD_PRIORITY+10
 
+#define NUM_KEY			"num"
+
 
 typedef double (* ARG0)();					//used for functions which get constants such as e, or PI
 typedef double (* ARG1)(double);			//used for functions which return math functions which take 1 argument such as sin or cos or par

@@ -82,12 +82,12 @@ const string Operator::isValid(const string s)
 	return isValid(s, garbage);
 }
 
-inline void Operator::setLeft(Operator * const oper)
+void Operator::setLeft(Operator * const oper)
 {
 	lOperand = oper;
 }
 
-inline void Operator::setRight(Operator * const oper)
+void Operator::setRight(Operator * const oper)
 {
 	rOperand = oper;
 }
@@ -102,12 +102,12 @@ const bool Operator::setLoc(char * const loc)
 		return false;
 	case NUM:
 		result		= atof(symbol.c_str());
-		opFunc		= NULL;
+		opFunc		= opSymb::valid[NUM_KEY];
 		opLoc		= loc;
 		break;
 	case VAR:
 		result		= 0;
-		opFunc		= NULL;
+		opFunc		= opSymb::valid[NUM_KEY];
 		opLoc		= loc;
 		break;
 	case SYM:
@@ -122,22 +122,22 @@ const bool Operator::setLoc(char * const loc)
 	return true;
 }
 
-inline const Operator * const Operator::getLeft() const
+const Operator * const Operator::getLeft() const
 {
 	return lOperand;
 }
 
-inline const Operator * const Operator::getRight() const
+const Operator * const Operator::getRight() const
 {
 	return rOperand;
 }
 
-inline char * const Operator::getLoc() const
+char * const Operator::getLoc() const
 {
 	return opLoc;
 }
 
-inline const Operator::op_t Operator::getOpType() const
+const Operator::op_t Operator::getOpType() const
 {
 	return opType;
 }

@@ -5,6 +5,11 @@ Expression::Expression(char * const init)
 	setRaw(init);
 }
 
+Expression::Expression(string init)
+{
+	setRaw(const_cast<char *>(init.c_str()));
+}
+
 void Expression::setRaw(char * const s)
 {
 	if(raw == NULL)
@@ -17,8 +22,15 @@ void Expression::setRaw(char * const s)
 	convert();
 	for(vector<Operator *>::iterator i = conv.begin(); i != conv.end(); i++)
 	{
-		(*i)->setLeft(*getOperand(i, 0));
-		(*i)->setRight(*getOperand(i, RIGHT));
+		switch((*i)->getFunc()->getArguments())
+		{
+		case 2:
+			(*i)->setLeft(*getOperand(i, 0));
+		case 1:
+			(*i)->setRight(*getOperand(i, RIGHT));
+		case 0:
+			break;
+		}
 	}
 }
 
@@ -34,11 +46,17 @@ void Expression::process()
 	string garbage;
 	for(string::iterator i = proc.begin(); i != proc.end(); i++)
 	{
+		if(*i == ' ')
+			proc.erase(i);
+	}
+
+	for(string::iterator i = proc.begin(); (i+2) != proc.end(); i++)
+	{
 		if(*i != '+' && *(i+1) == '-' && (Operator::isValid(&(*(i+2)), garbage) != Operator::INVALID))
 			proc.replace(i+1, i+2, "+-");
 	}
 
-	for(string::iterator i = proc.begin(); i != proc.end(); i++)
+	for(string::iterator i = proc.begin(); i+1 != proc.end(); i++)
 	{
 		if(*i == '-' && !Operator::isValidNum(*(i+1)))
 			proc.replace(i, i+1, "-1*");
@@ -57,13 +75,16 @@ void Expression::convert()
 		return;
 	}
 	Operator::op_t T;
+	string symb;
 	for(string::iterator i = proc.begin(); i != proc.end(); i++)
 	{
-		if(!Operator::isValid(&(*i), T).empty())
+		if(!(symb=Operator::isValid(&(*i), T)).empty())
 		{
 			conv.push_back(new Operator(&(*i), NULL, NULL));
 			if(T == Operator::VAR && conv.back()->getVariable() != NULL)
 				variables[*conv.back()->getLoc()].push_back(conv.back()->getVariable());
+			for(string::iterator j = symb.begin(); j != symb.end(); j++, i++);
+			i--;
 		}
 	}
 }
@@ -73,23 +94,48 @@ Expression::OpIter Expression::getOperand(Expression::OpIter init, unsigned shor
 	if(conv.empty())
 	{
 		printf("(from Expression::getOperand())\n > unprepared");
-		return;
+		return conv.end();
 	}
 	bool right = flags & RIGHT;
 	bool skip = flags & SKIP;
 	bool high = *(*init)->getLoc() == (right? '(':')');
 	OpIter i, best = conv.end();
-	for(i = init+(right? 1:-1); *(*i)->getLoc() != (right? ')':'('); right? ++i:--i)
+	for(i = init+(right? 1:-1); i != (right? conv.end():conv.begin()) && (!right? (*(*i)->getLoc() != '('):(*((*i)->getLoc()-1) != ')')); right? ++i:--i)
 	{
 		if(!skip)
 		{
-			if((*i)->getFunc()->getPriority() <= (high? 0:((*init)->getFunc()->getPriority())) &&
-				(*i)->getFunc()->getPriority() > (best == conv.end()? 0:(*best)->getFunc()->getPriority()))
-				best = i;
-			if((*i)->getFunc()->getPriority() >= (high? 0:((*init)->getFunc()->getPriority())))
+			if(right? ((*i)->getFunc()->getPriority() >= (high? HIGH_PRIORITY:((*init)->getFunc()->getPriority()))):
+				((*i)->getFunc()->getPriority() > (high? HIGH_PRIORITY:((*init)->getFunc()->getPriority()))))
 				break;
+			if((*i)->getFunc()->getPriority() <= (high? HIGH_PRIORITY:((*init)->getFunc()->getPriority())) &&
+				(right? ((*i)->getFunc()->getPriority() >= (best == conv.end()? -1:(*best)->getFunc()->getPriority())):
+				((*i)->getFunc()->getPriority() > (best == conv.end()? -1:(*best)->getFunc()->getPriority()))))
+				best = i;
 		}
-		if(*(*i)->getLoc() == (right? '(':')'))
+
+		if(right? (*(*i)->getLoc() == '('):(*((*i)->getLoc()-1) == ')'))
+		{
 			i = getOperand(i, (flags & RIGHT) | SKIP);
+			right? --i:++i;
+		}
+	}
+
+	return skip? i:best;
+}
+
+double Expression::evaluate()
+{
+	for(VarIter i = variables.begin(); i != variables.end(); i++)
+	{
+		for(vector<double *>::iterator j = i->second.begin(); j != i->second.end(); **(j++)=0);
+	}
+	try
+	{
+		return conv[0]->getResult();
+	}
+	catch(int e)
+	{
+		if(e==2)
+			printf("\nExpression class failed\n");
 	}
 }
