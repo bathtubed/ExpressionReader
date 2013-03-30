@@ -60,6 +60,11 @@ void Expression::process()
 	{
 		if(*i == '-' && !Operator::isValidNum(*(i+1)))
 			proc.replace(i, i+1, "-1*");
+		if((Operator::isValid(&*(i+1), garbage) != Operator::INVALID && (Operator::isValid(&*(i+1), garbage) != Operator::SYM || *i=='(')) &&
+			(Operator::isValid(&*i, garbage) == Operator::VAR || Operator::isValidNum(*i) || *i==')') &&
+			!(Operator::isValid(&*i, garbage) == Operator::NUM && Operator::isValid(&*(i+1), garbage) == Operator::NUM))
+			proc.insert(i+1, '*');
+		
 	}
 
 	proc.insert(proc.begin(), '(');
@@ -123,11 +128,19 @@ Expression::OpIter Expression::getOperand(Expression::OpIter init, unsigned shor
 	return skip? i:best;
 }
 
-double Expression::evaluate()
+double Expression::evaluate(Arg_t *args)
 {
 	for(VarIter i = variables.begin(); i != variables.end(); i++)
 	{
-		for(vector<double *>::iterator j = i->second.begin(); j != i->second.end(); **(j++)=0);
+		try
+		{
+			for(vector<double *>::iterator j = i->second.begin(); j != i->second.end(); **(j++)=args->at(i->first));
+		}
+		catch(out_of_range)
+		{
+			printf("Expression::evaluate(unordered_map<char, double>args) was passed with an insufficient argument list");
+			return 0.0;
+		}
 	}
 	try
 	{
@@ -137,5 +150,14 @@ double Expression::evaluate()
 	{
 		if(e==2)
 			printf("\nExpression class failed\n");
+		return 0.0;
 	}
+}
+
+double Expression::evaluate()
+{
+	Arg_t *args = new Arg_t;
+	for(VarIter i = variables.begin(); i != variables.end(); i++)
+		(*args)[i->first] = 0.0;
+	return evaluate(args);
 }

@@ -9,6 +9,7 @@ class Expression
 public:
 	typedef vector<Operator *>::iterator OpIter;
 	typedef unordered_map<char, vector<double *>>::iterator VarIter;
+	typedef unordered_map<char, double> Arg_t;
 private:
 	char *raw;									//raw user input
 	string proc;								//processed user input into readable content
@@ -26,6 +27,7 @@ public:
 	void setRaw(char * const s);
 
 	double evaluate();	//Default; Sets all variables to 0;
+	double evaluate(Arg_t *args);
 };
 
 

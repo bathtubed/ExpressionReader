@@ -5,9 +5,11 @@
 int main(void)
 {
 	opSymb::loadValid();
-	string expression("4.93^2 * -(6+3/2)");
+	string expression("3x^2 + 5x - 9");
 	Expression *expr = new Expression(expression);
-	cout<<expression<<endl<<expr->evaluate()<<endl;
+	Expression::Arg_t *args = new Expression::Arg_t;
+	(*args)['x'] = 3.0;
+	cout<<expression<<endl<<expr->evaluate(args)<<endl;
 	system("pause");
 	return 0;
 }

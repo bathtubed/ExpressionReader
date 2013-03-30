@@ -50,7 +50,8 @@ const Operator::op_t Operator::isValid(const string s, string &dest)
 	if((s[0] >= 'a' && s[0] <= 'z') ||
 		(s[0] >= 'A' && s[0] <= 'Z'))
 	{
-		dest[0] = s[0];
+		dest.resize(1);
+		dest[0]=s[0];
 		return VAR;
 	}
 	else
