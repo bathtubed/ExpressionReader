@@ -56,31 +56,32 @@ string * const Expression::process(char * const s)
 			rtrn->erase(i);
 	}
 
-	for(string::iterator i = rtrn->begin(); (i+2) != rtrn->end(); i++)
+	for(string::iterator j = rtrn->begin(); (j+2) != rtrn->end(); j++)
 	{
-		if(Operator::isValid(&*i, garbage) != Operator::SYM && *(i+1) == '-' && (Operator::isValid(&(*(i+2)), garbage) != Operator::INVALID))
-			rtrn->replace(i+1, i+2, "+-");
+		if(Operator::isValid(&*j, garbage) != Operator::SYM && *(j+1) == '-' && (Operator::isValid(&(*(j+2)), garbage) != Operator::INVALID))
+			rtrn->replace(j+1, j+2, "+-");
 	}
 
 	rtrn->insert(rtrn->begin(), '(');
 	rtrn->append(")");
-	for(string::iterator i = rtrn->begin(); i+1 != rtrn->end(); i++)
+	for(string::iterator k = rtrn->begin(); k+1 != rtrn->end(); k++)
 	{
-		if(*i == '-' && !Operator::isValidNum(*(i+1)))
-			rtrn->replace(i, i+1, "-1*");
-		if((Operator::isValid(&*(i+1), garbage) != Operator::INVALID && (Operator::isValid(&*(i+1), garbage) != Operator::SYM || *i=='(')) &&
-			(Operator::isValid(&*i, garbage) == Operator::VAR || Operator::isValidNum(*i) || *i==')') &&
-			!(Operator::isValid(&*i, garbage) == Operator::NUM && Operator::isValid(&*(i+1), garbage) == Operator::NUM))
+		if(*k == '-' && !Operator::isValidNum(*(k+1)))
+			rtrn->replace(k, k+1, "-1*");
+		if((Operator::isValid(&*(k+1), garbage) != Operator::INVALID && (Operator::isValid(&*(k+1), garbage) != Operator::SYM || *(k+1)=='(')) &&
+			(Operator::isValid(&*k, garbage) == Operator::VAR || Operator::isValidNum(*k) || *k==')') &&
+			!(Operator::isValid(&*k, garbage) == Operator::NUM && Operator::isValid(&*(k+1), garbage) == Operator::NUM))
 		{
-			if(Operator::isValid(&*i, garbage) == Operator::SYM)
+			if(Operator::isValid(&*k, garbage) == Operator::SYM)
 			{
 				if(opSymb::valid[garbage]->getArguments())
-					rtrn->insert(i+1, '*');
+					rtrn->insert(k+1, '*');
 			}
 			else
-				rtrn->insert(i+1, '*');
+			{
+				rtrn->insert(k+1, '*');
+			}
 		}
-		
 	}
 
 	return rtrn;
