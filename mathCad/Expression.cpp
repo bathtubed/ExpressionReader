@@ -5,123 +5,152 @@ Expression::Expression(char * const init)
 	setRaw(init);
 }
 
-Expression::Expression(string init)
+Expression::Expression(string &init)
 {
 	setRaw(const_cast<char *>(init.c_str()));
 }
 
 void Expression::setRaw(char * const s)
 {
-	if(raw == NULL)
+	if(s == NULL)
 	{
 		printf("(from Expression::setRaw())\n > Bad args\n");
 		return;
 	}
 	raw = s;
-	process();
-	convert();
-	for(vector<Operator *>::iterator i = conv.begin(); i != conv.end(); i++)
+	proc = *process(raw);
+	conv = *convert(proc, variables);
+	link(conv);
+}
+
+const bool Expression::link(vector<Operator *> &expr)
+{
+	for(vector<Operator *>::iterator i = expr.begin(); i != expr.end(); i++)
 	{
 		switch((*i)->getFunc()->getArguments())
 		{
 		case 2:
-			(*i)->setLeft(*getOperand(i, 0));
+			(*i)->setLeft(*getOperand(expr, i, 0));
 		case 1:
-			(*i)->setRight(*getOperand(i, RIGHT));
+			(*i)->setRight(*getOperand(expr, i, RIGHT));
 		case 0:
 			break;
 		}
 	}
+	return true;
 }
 
-void Expression::process()
+string * const Expression::process(char * const s)
 {
-	if(raw == NULL)
+	if(s == NULL)
 	{
 		printf("(from Expression::process())\n > NULL data");
-		return;
+		return NULL;
 	}
 	
-	proc = raw;
+	string *rtrn = new string(s);
 	string garbage;
-	for(string::iterator i = proc.begin(); i != proc.end(); i++)
+	for(string::iterator i = rtrn->begin(); i != rtrn->end(); i++)
 	{
 		if(*i == ' ')
-			proc.erase(i);
+			rtrn->erase(i);
 	}
 
-	for(string::iterator i = proc.begin(); (i+2) != proc.end(); i++)
+	for(string::iterator i = rtrn->begin(); (i+2) != rtrn->end(); i++)
 	{
 		if(Operator::isValid(&*i, garbage) != Operator::SYM && *(i+1) == '-' && (Operator::isValid(&(*(i+2)), garbage) != Operator::INVALID))
-			proc.replace(i+1, i+2, "+-");
+			rtrn->replace(i+1, i+2, "+-");
 	}
 
-	for(string::iterator i = proc.begin(); i+1 != proc.end(); i++)
+	rtrn->insert(rtrn->begin(), '(');
+	rtrn->append(")");
+	for(string::iterator i = rtrn->begin(); i+1 != rtrn->end(); i++)
 	{
 		if(*i == '-' && !Operator::isValidNum(*(i+1)))
-			proc.replace(i, i+1, "-1*");
+			rtrn->replace(i, i+1, "-1*");
 		if((Operator::isValid(&*(i+1), garbage) != Operator::INVALID && (Operator::isValid(&*(i+1), garbage) != Operator::SYM || *i=='(')) &&
 			(Operator::isValid(&*i, garbage) == Operator::VAR || Operator::isValidNum(*i) || *i==')') &&
 			!(Operator::isValid(&*i, garbage) == Operator::NUM && Operator::isValid(&*(i+1), garbage) == Operator::NUM))
-			proc.insert(i+1, '*');
+		{
+			if(Operator::isValid(&*i, garbage) == Operator::SYM)
+			{
+				if(opSymb::valid[garbage]->getArguments())
+					rtrn->insert(i+1, '*');
+			}
+			else
+				rtrn->insert(i+1, '*');
+		}
 		
 	}
 
-	proc.insert(proc.begin(), '(');
-	proc.append(")");
-
+	return rtrn;
 }
 
-void Expression::convert()
+vector<Operator *> * const Expression::convert(string &s, unordered_map<char, vector<double *>> &vars)
 {
-	if(proc.empty())
+	if(s.empty())
 	{
 		printf("(from Expression::convert())\n > Empty data");
-		return;
+		return NULL;
 	}
+
+	vector<Operator *> *rtrn = new vector<Operator *>;
 	Operator::op_t T;
 	string symb;
-	for(string::iterator i = proc.begin(); i != proc.end(); i++)
+	for(string::iterator i = s.begin(); i != s.end(); i++)
 	{
 		if(!(symb=Operator::isValid(&(*i), T)).empty())
 		{
-			conv.push_back(new Operator(&(*i), NULL, NULL));
-			if(T == Operator::VAR && conv.back()->getVariable() != NULL)
-				variables[*conv.back()->getLoc()].push_back(conv.back()->getVariable());
+			rtrn->push_back(new Operator(&(*i), NULL, NULL));
+			if(T == Operator::VAR && rtrn->back()->getVariable() != NULL)
+				vars[*rtrn->back()->getLoc()].push_back(rtrn->back()->getVariable());
 			for(string::iterator j = symb.begin(); j != symb.end(); j++, i++);
 			i--;
 		}
 	}
+
+	return rtrn;
 }
 
-Expression::OpIter Expression::getOperand(Expression::OpIter init, unsigned short flags)
+const Expression::OpIter Expression::getOperand(vector<Operator *> &expr, const Expression::OpIter &init, unsigned short flags)
 {
-	if(conv.empty())
+	if(expr.empty())
 	{
 		printf("(from Expression::getOperand())\n > unprepared");
-		return conv.end();
+		return expr.end();
 	}
 	bool right = flags & RIGHT;
 	bool skip = flags & SKIP;
 	bool high = *(*init)->getLoc() == (right? '(':')');
-	OpIter i, best = conv.end();
-	for(i = init+(right? 1:-1); i != (right? conv.end():conv.begin()) && (!right? (*(*i)->getLoc() != '('):(*((*i)->getLoc()-1) != ')')); right? ++i:--i)
+	bool rep = true;
+	OpIter i, best = expr.end();
+	if(*((*init)->getLoc()-1) == ')' && !right && !skip)
 	{
+		i = getOperand(expr, init, SKIP);
+		best = i;
+		i--;
+	}
+	else
+		i = init+(right? 1:-1);
+	for( ; i != (right? expr.end():expr.begin()) && (rep? (!right? (*(*i)->getLoc() != '('):(*((*i)->getLoc()-1) != ')')):true); right? ++i:--i)
+	{
+		rep = true;
 		if(!skip)
 		{
 			if(right? ((*i)->getFunc()->getPriority() >= (high? HIGH_PRIORITY:((*init)->getFunc()->getPriority()))):
 				((*i)->getFunc()->getPriority() > (high? HIGH_PRIORITY:((*init)->getFunc()->getPriority()))))
 				break;
 			if((*i)->getFunc()->getPriority() <= (high? HIGH_PRIORITY:((*init)->getFunc()->getPriority())) &&
-				(right? ((*i)->getFunc()->getPriority() >= (best == conv.end()? -1:(*best)->getFunc()->getPriority())):
-				((*i)->getFunc()->getPriority() > (best == conv.end()? -1:(*best)->getFunc()->getPriority()))))
+				(right? ((*i)->getFunc()->getPriority() >= (best == expr.end()? -1:(*best)->getFunc()->getPriority())):
+				((*i)->getFunc()->getPriority() > (best == expr.end()? -1:(*best)->getFunc()->getPriority()))))
 				best = i;
 		}
 
 		if(right? (*(*i)->getLoc() == '('):(*((*i)->getLoc()-1) == ')'))
 		{
-			i = getOperand(i, (flags & RIGHT) | SKIP);
-			right? --i:++i;
+			i = getOperand(expr, i, (flags & RIGHT) | SKIP);
+			right? i--:i++;
+			rep = false;
 		}
 	}
 

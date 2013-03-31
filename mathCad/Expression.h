@@ -16,13 +16,14 @@ private:
 	vector<Operator *> conv;					//vector/array of pointers to Operators in proc
 	unordered_map<char, vector<double *>> variables;	//database of char->double addresses representing the variables
 private:
-	void process();	//processes the raw string into a readable string
-	void convert();	//converts the processed string into a series of Operators
+	static string * const process(char * const s);		//processes the raw string into a readable string
+	static vector<Operator *> * const convert(string &s, unordered_map<char, vector<double *>> &vars);//converts the processed string into a series of Operators
 	enum { RIGHT=0x0001, SKIP=0x0002 };		//returns the Operator which is the Operand of the Operator pointed to by init
-	OpIter getOperand(OpIter init, unsigned short flags);
+	static const OpIter getOperand(vector<Operator *> &expr, const OpIter &init, const unsigned short flags);
+	static const bool link(vector<Operator *> &expr);
 public:
 	Expression(char * const init);
-	Expression(string init);
+	Expression(string &init);
 
 	void setRaw(char * const s);
 
