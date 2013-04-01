@@ -7,20 +7,31 @@ Expression::Expression(char * const init)
 
 Expression::Expression(string &init)
 {
-	setRaw(const_cast<char *>(init.c_str()));
+	if(!setRaw(const_cast<char *>(init.c_str())))
+	{
+		printf("Invalid initialization\n");
+		throw 42;
+	}
 }
 
-void Expression::setRaw(char * const s)
+const bool Expression::setRaw(char * const s)
 {
 	if(s == NULL)
 	{
 		printf("(from Expression::setRaw())\n > Bad args\n");
-		return;
+		return false;
 	}
 	raw = s;
 	proc = *process(raw);
-	conv = *convert(proc, variables);
-	link(conv);
+	if(validate(proc))
+	{
+		conv = *convert(proc, variables);
+		link(conv);
+	}
+	else
+		return false;
+	
+	return true;
 }
 
 const bool Expression::link(vector<Operator *> &expr)
@@ -82,6 +93,20 @@ string * const Expression::process(char * const s)
 	}
 
 	return rtrn;
+}
+
+const bool Expression::validate(string &s)
+{
+	int paren=0;
+	for(string::iterator i = s.begin(); i != s.end(); i++)
+	{
+		if(*i == '(')
+			paren++;
+		else if(*i == ')')
+			paren--;
+	}
+	
+	return !paren;
 }
 
 vector<Operator *> * const Expression::convert(string &s, unordered_map<char, vector<double *>> &vars)
@@ -187,4 +212,10 @@ double Expression::evaluate()
 	for(VarIter i = variables.begin(); i != variables.end(); i++)
 		(*args)[i->first] = 0.0;
 	return evaluate(args);
+}
+
+void Expression::print(void)
+{
+	printf("raw input: %s\n", raw);
+	printf("processed input: %s\n", proc.c_str());
 }
