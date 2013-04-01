@@ -5,7 +5,7 @@
 int main(void)
 {
 	opSymb::loadValid();
-	string expression("20x(5x+3)-6x(5x^2+11/2)");
+	string expression("(8x^(4-2)+20)(12+x/8)");
 	Expression *expr = new Expression(expression);
 	Expression::Arg_t *args = new Expression::Arg_t;
 	(*args)['x'] = 3;

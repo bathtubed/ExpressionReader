@@ -50,11 +50,8 @@ string * const Expression::process(char * const s)
 	
 	string *rtrn = new string(s);
 	string garbage;
-	for(string::iterator i = rtrn->begin(); i != rtrn->end(); i++)
-	{
-		if(*i == ' ')
-			rtrn->erase(i);
-	}
+
+	rtrn->erase(remove(rtrn->begin(), rtrn->end(), ' '), rtrn->end());
 
 	for(string::iterator j = rtrn->begin(); (j+2) != rtrn->end(); j++)
 	{
@@ -75,11 +72,11 @@ string * const Expression::process(char * const s)
 			if(Operator::isValid(&*k, garbage) == Operator::SYM)
 			{
 				if(opSymb::valid[garbage]->getArguments())
-					rtrn->insert(k+1, '*');
+					k = rtrn->insert(k+1, '*')-1;
 			}
 			else
 			{
-				rtrn->insert(k+1, '*');
+				k = rtrn->insert(k+1, '*')-1;
 			}
 		}
 	}
